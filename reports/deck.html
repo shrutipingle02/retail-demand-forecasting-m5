@@ -1,0 +1,388 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Predicting What Walmart Sells Tomorrow</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #0b1f52; }
+
+  :root {
+    --blue: #2a5fdb;
+    --navy: #0b1f52;
+    --gold: #f5b53f;
+    --ink: #1a1a1a;
+    --grey: #6b6b6b;
+  }
+
+  .slide {
+    width: 13.333in; height: 7.5in; padding: 0.55in 0.7in 0.75in;
+    page-break-after: always; position: relative; background: #fff;
+    display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  h1 { font-size: 30pt; margin: 0 0 10px; letter-spacing: -0.4px; }
+  h2 { font-size: 22pt; margin: 0 0 22px; letter-spacing: -0.3px; }
+  .lede { font-size: 12pt; color: var(--ink); margin: -12px 0 20px; }
+
+  /* progress bar, bottom of every content slide */
+  .nav { position: absolute; left: 0.7in; right: 0.7in; bottom: 0.3in;
+         display: flex; gap: 10px; }
+  .nav div { flex: 1; text-align: center; font-size: 9.5pt; padding: 7px 0;
+             background: #eeeeee; color: #666; border-radius: 3px; }
+  .nav div.on { background: var(--blue); color: #fff; font-weight: 600; }
+
+  .spark { position: absolute; top: 0.5in; right: 0.7in; width: 42px; }
+
+  /* title slide */
+  .title { flex-direction: row; padding: 0; }
+  .title .left { width: 46%; background: var(--blue); display: flex;
+                 align-items: center; justify-content: center; }
+  .title .right { flex: 1; display: flex; flex-direction: column;
+                  justify-content: center; padding: 0 0.8in; }
+  .title h1 { font-size: 44pt; line-height: 1.06; margin-bottom: 16px; }
+  .title p { font-size: 17pt; font-weight: 600; margin: 0; }
+
+  .cols { display: flex; gap: 46px; flex: 1; align-items: center; }
+  .cols.top { align-items: flex-start; }
+  .col { flex: 1; }
+  .col h3 { font-size: 15pt; margin: 0 0 10px; }
+  .col p, .col li { font-size: 11.5pt; color: var(--ink); line-height: 1.5; }
+  ul { margin: 0; padding-left: 17px; }
+  li { margin-bottom: 7px; }
+
+  .box { border: 1.5px solid var(--gold); border-radius: 7px;
+         padding: 14px 20px; font-size: 12pt; }
+  .box b { color: var(--navy); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 11pt; }
+  th { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1.5px solid #cfcfcf;
+       font-size: 11pt; color: var(--navy); }
+  td { padding: 9px 12px 9px 0; border-bottom: 1px solid #eee; color: var(--ink); }
+  tr.hi td { background: #fffaef; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 20px; }
+
+  figure { margin: 0; flex: 1; display: flex; flex-direction: column;
+           align-items: center; justify-content: center; }
+  figure img { max-height: 4.5in; max-width: 100%; }
+  figcaption { font-size: 10pt; color: var(--grey); margin-top: 10px; text-align: center; }
+
+  .take { background: var(--gold); border-radius: 5px; padding: 11px 18px;
+          font-size: 11.5pt; margin-top: 14px; }
+
+  .stat { display: flex; gap: 30px; margin: 6px 0 18px; }
+  .stat div { flex: 1; border-left: 3px solid var(--gold); padding-left: 14px; }
+  .stat .n { font-size: 30pt; font-weight: 700; line-height: 1.1; }
+  .stat .l { font-size: 10.5pt; color: var(--grey); }
+
+  /* sliding-window diagram */
+  .win { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; font-size: 10pt; }
+  .win .lab { width: 78px; color: var(--grey); text-align: right; }
+  .cell { width: 34px; height: 21px; border-radius: 2px; }
+  .in { background: #bcd8f7; }
+  .pred { background: var(--gold); }
+  .gap { width: 34px; }
+  .legend { display: flex; gap: 22px; font-size: 10pt; color: var(--grey);
+            margin-bottom: 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 20px; height: 13px; border-radius: 2px; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<div class="slide title">
+  <div class="left">
+    <svg width="220" height="220" viewBox="0 0 100 100">
+      <g fill="#f5b53f">
+        <rect x="46" y="8"  width="8" height="26" rx="4"/>
+        <rect x="46" y="66" width="8" height="26" rx="4"/>
+        <rect x="8"  y="46" width="26" height="8" rx="4"/>
+        <rect x="66" y="46" width="26" height="8" rx="4"/>
+        <rect x="18" y="18" width="8" height="26" rx="4" transform="rotate(-45 22 31)"/>
+        <rect x="74" y="18" width="8" height="26" rx="4" transform="rotate(45 78 31)"/>
+        <rect x="18" y="56" width="8" height="26" rx="4" transform="rotate(45 22 69)"/>
+        <rect x="74" y="56" width="8" height="26" rx="4" transform="rotate(-45 78 69)"/>
+      </g>
+    </svg>
+  </div>
+  <div class="right">
+    <h1>Predicting What<br>Walmart Sells Tomorrow</h1>
+    <p>28-Day Demand Forecasting on the M5 Dataset</p>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="slide">
+  <h2>The Forecasting Challenge</h2>
+  <div class="cols">
+    <div class="col">
+      <h3>Situation</h3>
+      <p>Ten stores. Around 3,000 products in each. Every one of them needs a stocking
+      decision, every single day.</p>
+      <p>That is 30,490 separate forecasts to produce, and then produce again tomorrow.</p>
+    </div>
+    <div class="col">
+      <h3>Why it is hard</h3>
+      <ul>
+        <li><b>Demand swings</b> sharply between departments and days</li>
+        <li><b>Most days are zero</b> &mdash; a typical item sells nothing in a typical store</li>
+        <li><b>Mistakes cost both ways</b> &mdash; overstock ties up cash, stockouts lose the sale</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box"><b>The question:</b> can a model forecast 28 days ahead well enough to
+  guide real stocking decisions &mdash; and how would we know if it did?</div>
+  <div class="nav"><div class="on">Context</div><div>Data</div><div>Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 3 -->
+<div class="slide">
+  <h2>The Data</h2>
+  <div class="stat">
+    <div><div class="n">30,490</div><div class="l">item-store series</div></div>
+    <div><div class="n">1,941</div><div class="l">days of history</div></div>
+    <div><div class="n">26.5M</div><div class="l">rows after reshaping</div></div>
+    <div><div class="n">68%</div><div class="l">of item-days are zero</div></div>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <h3>What we get</h3>
+      <ul>
+        <li><b>Sales</b> &mdash; daily units, Jan 2011 to Apr 2016</li>
+        <li><b>Prices</b> &mdash; weekly, per store and item</li>
+        <li><b>Calendar</b> &mdash; holidays, SNAP benefit days, weekends</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>How it nests</h3>
+      <p style="font-size:11.5pt;line-height:1.9">
+        3 states &nbsp;&rarr;&nbsp; 10 stores &nbsp;&rarr;&nbsp; 3 categories<br>
+        &rarr;&nbsp; 7 departments &nbsp;&rarr;&nbsp; 3,049 items
+      </p>
+      <p style="color:#6b6b6b;font-size:10.5pt">Forecasts are judged at every one of these
+      levels, not just the bottom.</p>
+    </div>
+  </div>
+  <div class="nav"><div>Context</div><div class="on">Data</div><div>Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 4 -->
+<div class="slide">
+  <h2>Four Models, Increasing Complexity</h2>
+  <table>
+    <tr><th style="width:20%">Model</th><th style="width:42%">Idea</th><th>What happened</th></tr>
+    <tr><td><b>LightGBM</b></td><td>Boosted trees on engineered features</td>
+        <td>Broke on a data leak &mdash; see slide 8</td></tr>
+    <tr><td><b>LSTM</b></td><td>Sequence model, predicts one day at a time</td>
+        <td>Trains slowly, no better for it</td></tr>
+    <tr class="hi"><td><b>GRU</b></td><td>Lighter sequence model, same approach</td>
+        <td><b>Best model built</b> &mdash; faster and more accurate than LSTM</td></tr>
+    <tr><td><b>Seq2Seq GRU</b></td><td>Encoder&ndash;decoder, all 28 days at once</td>
+        <td>Quickest to train, slightly behind GRU</td></tr>
+  </table>
+  <div class="take"><b>Takeaway:</b> GRU won among the models &mdash; but winning the comparison
+  turned out not to be the same as being useful.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 5 -->
+<div class="slide">
+  <h2>How the Model Learns</h2>
+  <div class="legend">
+    <span><i class="sw in"></i> days it reads</span>
+    <span><i class="sw pred"></i> day it predicts</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="win"><div class="lab">Window 1</div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 2</div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 3</div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 4</div><div class="gap"></div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 5</div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 6</div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 7</div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+    <div class="win"><div class="lab">Window 8</div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div><div class="gap"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell in"></div><div class="cell in"></div>
+      <div class="cell in"></div><div class="cell pred"></div></div>
+  </div>
+  <p style="font-size:11.5pt;margin-top:16px">The network reads a fixed window of recent
+  days and predicts the next one. Slide the window forward and repeat &mdash; that is the whole
+  training set. To forecast 28 days, its own prediction is fed back in as input, 28 times.</p>
+  <div class="take"><b>This matters later:</b> feeding predictions back into the model is
+  exactly where the forecast goes wrong.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 6 -->
+<div class="slide">
+  <h2>Not All Mistakes Matter Equally</h2>
+  <p class="lede">Missing a fast seller by ten units is a real problem. Missing a slow one by
+  ten units barely registers.</p>
+  <div class="cols">
+    <div class="col">
+      <h3>WRMSSE</h3>
+      <p>The competition metric weights each error by the dollars that product actually
+      sells, and scores it against a naive &ldquo;same as yesterday&rdquo; forecast.</p>
+      <p><b>Below 1.0</b> means you beat that naive forecast.<br>
+         <b>Above 1.0</b> means you did not.</p>
+    </div>
+    <div class="col">
+      <h3>The baseline, set first</h3>
+      <p>Before training anything, we scored the simplest possible forecast: repeat the
+      last 28 days.</p>
+      <div class="stat" style="margin-top:18px">
+        <div><div class="n">0.8377</div><div class="l">naive baseline &mdash; the number to beat</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="box"><b>Why set it first:</b> without a baseline, any score sounds reasonable.
+  With one, you know immediately whether the model earned its keep.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 7 -->
+<div class="slide">
+  <h2>Results</h2>
+  <figure>
+    <img src="figures/01_scoreboard.png">
+    <figcaption>WRMSSE on the 28 held-out days. Lower is better. Dashed line is the naive baseline.</figcaption>
+  </figure>
+  <div class="take"><b>No model beat the baseline.</b> The best of them, the GRU at 1.0365,
+  is 24% worse than simply repeating last month's sales.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 8 -->
+<div class="slide">
+  <h2>Why: The Forecast Goes Flat</h2>
+  <figure>
+    <img src="figures/04_forecast.png">
+    <figcaption>Total units sold per day. History on the left, the 28-day forecast on the right.</figcaption>
+  </figure>
+  <div class="take"><b>Sales run on a weekly cycle.</b> The naive forecast copies it exactly.
+  The GRU settles into a flat line near the average &mdash; it learns the level of demand and
+  loses the shape.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 9 -->
+<div class="slide">
+  <h2>A Score That Looked Too Good</h2>
+  <div class="cols">
+    <div class="col" style="flex:0 0 44%">
+      <p style="font-size:11.5pt">LightGBM first scored <b>0.0088</b> &mdash; near-perfect, and
+      impossible.</p>
+      <p style="font-size:11.5pt">The target column had ended up inside the feature set. The
+      model was not forecasting sales, it was reading them. One missing comma in a list of
+      columns to exclude, no error raised.</p>
+      <p style="font-size:11.5pt">We scored the same models twice: once with that column
+      visible, once blanked out &mdash; which is what happens when you forecast a future that
+      has not happened yet.</p>
+    </div>
+    <div class="col">
+      <img src="figures/02_leak.png" style="width:100%;max-height:3.9in;object-fit:contain">
+    </div>
+  </div>
+  <div class="take"><b>The lesson is not &ldquo;check for leaks.&rdquo;</b> It is that validation
+  scores cannot catch this alone &mdash; the number got <i>better</i> as the model got more broken.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div class="on">Solution</div><div>Implementation</div></div>
+</div>
+
+<!-- 10 -->
+<div class="slide">
+  <h2>What This Means for Stocking Decisions</h2>
+  <div class="cols">
+    <div class="col">
+      <h3>Ship the baseline</h3>
+      <p>A naive seasonal forecast is currently the most accurate option available, costs
+      nothing to run, and never fails silently. It should be the default until a model
+      genuinely beats it.</p>
+    </div>
+    <div class="col">
+      <h3>Guard every deployment</h3>
+      <p>Any model that goes live is scored against the baseline on the same days. If it
+      loses, it does not ship. This one check would have caught every problem found here.</p>
+    </div>
+    <div class="col">
+      <h3>Know where it is weak</h3>
+      <p>The GRU is competitive on individual items but poor on store and category totals.
+      Aggregate planning and shelf-level replenishment need different treatment.</p>
+    </div>
+  </div>
+  <div class="box"><b>Honest position:</b> this work does not yet justify replacing existing
+  planning. What it does provide is a scoring harness that makes the next attempt
+  measurable.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div>Solution</div><div class="on">Implementation</div></div>
+</div>
+
+<!-- 11 -->
+<div class="slide">
+  <h2>Next Steps</h2>
+  <div class="cols">
+    <div class="col">
+      <h3>1. Train longer</h3>
+      <p>Five epochs was the budget, and the loss was still falling when it stopped. This is
+      the cheapest available gain.</p>
+      <h3 style="margin-top:22px">2. Tell it the weekday</h3>
+      <p>The strongest pattern in the data is weekly, and the networks are never told which
+      day it is. They are expected to infer it.</p>
+    </div>
+    <div class="col">
+      <h3>3. Drop the recursion</h3>
+      <p>Predicting all 28 days at once avoids the feedback loop that flattens the forecast.
+      The Seq2Seq model already does this and deserves a proper attempt.</p>
+      <h3 style="margin-top:22px">4. Fix the validation split</h3>
+      <p>Hold out a chronological block. The default trailing split removes the most recent
+      data, which is the most useful data there is.</p>
+    </div>
+  </div>
+  <div class="take"><b>Then:</b> re-score against the baseline. If it still loses, the honest
+  answer stays the same.</div>
+  <div class="nav"><div>Context</div><div>Data</div><div>Solution</div><div class="on">Implementation</div></div>
+</div>
+
+<!-- 12 -->
+<div class="slide title">
+  <div class="left" style="width:100%;flex-direction:column">
+    <svg width="150" height="150" viewBox="0 0 100 100">
+      <g fill="#f5b53f">
+        <rect x="46" y="8"  width="8" height="26" rx="4"/>
+        <rect x="46" y="66" width="8" height="26" rx="4"/>
+        <rect x="8"  y="46" width="26" height="8" rx="4"/>
+        <rect x="66" y="46" width="26" height="8" rx="4"/>
+        <rect x="18" y="18" width="8" height="26" rx="4" transform="rotate(-45 22 31)"/>
+        <rect x="74" y="18" width="8" height="26" rx="4" transform="rotate(45 78 31)"/>
+        <rect x="18" y="56" width="8" height="26" rx="4" transform="rotate(45 22 69)"/>
+        <rect x="74" y="56" width="8" height="26" rx="4" transform="rotate(-45 78 69)"/>
+      </g>
+    </svg>
+    <div style="color:#fff;font-size:34pt;font-weight:700;margin-top:26px">Thank you</div>
+  </div>
+</div>
+
+</body>
+</html>
