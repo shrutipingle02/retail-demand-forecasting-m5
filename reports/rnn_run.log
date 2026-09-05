@@ -1,0 +1,295 @@
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+
+LSTM  start_day=0  time_steps=7
+Epoch 1/5
+60/60 - 5s - 78ms/step - loss: 0.0156
+Epoch 2/5
+60/60 - 4s - 63ms/step - loss: 0.0136
+Epoch 3/5
+60/60 - 4s - 65ms/step - loss: 0.0132
+Epoch 4/5
+60/60 - 4s - 62ms/step - loss: 0.0129
+Epoch 5/5
+60/60 - 4s - 60ms/step - loss: 0.0127
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0953   (20s)
+
+GRU  start_day=0  time_steps=7
+Epoch 1/5
+60/60 - 4s - 69ms/step - loss: 0.0153
+Epoch 2/5
+60/60 - 3s - 44ms/step - loss: 0.0134
+Epoch 3/5
+60/60 - 3s - 44ms/step - loss: 0.0131
+Epoch 4/5
+60/60 - 3s - 46ms/step - loss: 0.0128
+Epoch 5/5
+60/60 - 3s - 46ms/step - loss: 0.0126
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0547   (15s)
+
+LSTM  start_day=0  time_steps=14
+Epoch 1/5
+60/60 - 7s - 119ms/step - loss: 0.0157
+Epoch 2/5
+60/60 - 6s - 97ms/step - loss: 0.0136
+Epoch 3/5
+60/60 - 6s - 100ms/step - loss: 0.0133
+Epoch 4/5
+60/60 - 6s - 106ms/step - loss: 0.0130
+Epoch 5/5
+60/60 - 6s - 105ms/step - loss: 0.0128
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.3365   (32s)
+
+GRU  start_day=0  time_steps=14
+Epoch 1/5
+60/60 - 6s - 98ms/step - loss: 0.0153
+Epoch 2/5
+60/60 - 5s - 82ms/step - loss: 0.0134
+Epoch 3/5
+60/60 - 5s - 83ms/step - loss: 0.0131
+Epoch 4/5
+60/60 - 5s - 86ms/step - loss: 0.0128
+Epoch 5/5
+60/60 - 5s - 90ms/step - loss: 0.0126
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0791   (27s)
+
+LSTM  start_day=150  time_steps=7
+Epoch 1/5
+55/55 - 5s - 89ms/step - loss: 0.0166
+Epoch 2/5
+55/55 - 4s - 74ms/step - loss: 0.0146
+Epoch 3/5
+55/55 - 4s - 78ms/step - loss: 0.0141
+Epoch 4/5
+55/55 - 5s - 89ms/step - loss: 0.0138
+Epoch 5/5
+55/55 - 5s - 85ms/step - loss: 0.0135
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.1247   (23s)
+
+GRU  start_day=150  time_steps=7
+Epoch 1/5
+55/55 - 5s - 93ms/step - loss: 0.0161
+Epoch 2/5
+55/55 - 4s - 69ms/step - loss: 0.0143
+Epoch 3/5
+55/55 - 3s - 62ms/step - loss: 0.0139
+Epoch 4/5
+55/55 - 4s - 65ms/step - loss: 0.0136
+Epoch 5/5
+55/55 - 4s - 73ms/step - loss: 0.0134
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0730   (20s)
+
+LSTM  start_day=150  time_steps=14
+Epoch 1/5
+55/55 - 9s - 161ms/step - loss: 0.0166
+Epoch 2/5
+55/55 - 7s - 127ms/step - loss: 0.0147
+Epoch 3/5
+55/55 - 7s - 128ms/step - loss: 0.0142
+Epoch 4/5
+55/55 - 6s - 114ms/step - loss: 0.0138
+Epoch 5/5
+55/55 - 6s - 117ms/step - loss: 0.0136
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.1497   (36s)
+
+GRU  start_day=150  time_steps=14
+Epoch 1/5
+55/55 - 7s - 120ms/step - loss: 0.0161
+Epoch 2/5
+55/55 - 5s - 92ms/step - loss: 0.0142
+Epoch 3/5
+55/55 - 5s - 90ms/step - loss: 0.0138
+Epoch 4/5
+55/55 - 5s - 84ms/step - loss: 0.0135
+Epoch 5/5
+55/55 - 5s - 90ms/step - loss: 0.0133
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0365   (26s)
+
+LSTM  start_day=365  time_steps=7
+Epoch 1/5
+49/49 - 4s - 85ms/step - loss: 0.0179
+Epoch 2/5
+49/49 - 3s - 70ms/step - loss: 0.0160
+Epoch 3/5
+49/49 - 3s - 70ms/step - loss: 0.0154
+Epoch 4/5
+49/49 - 3s - 62ms/step - loss: 0.0151
+Epoch 5/5
+49/49 - 3s - 61ms/step - loss: 0.0148
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.2903   (17s)
+
+GRU  start_day=365  time_steps=7
+Epoch 1/5
+49/49 - 3s - 71ms/step - loss: 0.0176
+Epoch 2/5
+49/49 - 3s - 52ms/step - loss: 0.0155
+Epoch 3/5
+49/49 - 2s - 50ms/step - loss: 0.0151
+Epoch 4/5
+49/49 - 2s - 48ms/step - loss: 0.0148
+Epoch 5/5
+49/49 - 2s - 49ms/step - loss: 0.0146
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.1996   (13s)
+
+LSTM  start_day=365  time_steps=14
+Epoch 1/5
+48/48 - 6s - 131ms/step - loss: 0.0179
+Epoch 2/5
+48/48 - 5s - 114ms/step - loss: 0.0161
+Epoch 3/5
+48/48 - 5s - 110ms/step - loss: 0.0155
+Epoch 4/5
+48/48 - 5s - 107ms/step - loss: 0.0152
+Epoch 5/5
+48/48 - 6s - 115ms/step - loss: 0.0149
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.2534   (28s)
+
+GRU  start_day=365  time_steps=14
+Epoch 1/5
+48/48 - 6s - 119ms/step - loss: 0.0175
+Epoch 2/5
+48/48 - 4s - 88ms/step - loss: 0.0154
+Epoch 3/5
+48/48 - 4s - 85ms/step - loss: 0.0150
+Epoch 4/5
+48/48 - 4s - 90ms/step - loss: 0.0147
+Epoch 5/5
+48/48 - 4s - 89ms/step - loss: 0.0144
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.3282   (23s)
+
+model  start_day  time_steps  wrmsse  final_loss  train_sec
+  GRU        150          14 1.03648    0.013311         26
+  GRU          0           7 1.05470    0.012592         15
+  GRU        150           7 1.07302    0.013367         20
+  GRU          0          14 1.07911    0.012622         27
+ LSTM          0           7 1.09533    0.012693         20
+ LSTM        150           7 1.12473    0.013550         23
+ LSTM        150          14 1.14975    0.013611         36
+  GRU        365           7 1.19955    0.014613         13
+ LSTM        365          14 1.25339    0.014862         28
+ LSTM        365           7 1.29029    0.014835         17
+  GRU        365          14 1.32824    0.014415         23
+ LSTM          0          14 1.33647    0.012812         32
+
+GRU {'units': 64, 'dropout': 0.2, 'batch_size': 32}
+Epoch 1/5
+54/54 - 7s - 122ms/step - loss: 0.0148 - val_loss: 0.0191
+Epoch 2/5
+54/54 - 5s - 94ms/step - loss: 0.0129 - val_loss: 0.0188
+Epoch 3/5
+54/54 - 5s - 96ms/step - loss: 0.0125 - val_loss: 0.0186
+Epoch 4/5
+54/54 - 5s - 90ms/step - loss: 0.0122 - val_loss: 0.0185
+Epoch 5/5
+54/54 - 5s - 90ms/step - loss: 0.0121 - val_loss: 0.0186
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.3237
+
+GRU {'units': 128, 'dropout': 0.3, 'batch_size': 64}
+Epoch 1/5
+27/27 - 9s - 331ms/step - loss: 0.0161 - val_loss: 0.0193
+Epoch 2/5
+27/27 - 8s - 302ms/step - loss: 0.0134 - val_loss: 0.0188
+Epoch 3/5
+27/27 - 7s - 269ms/step - loss: 0.0128 - val_loss: 0.0186
+Epoch 4/5
+27/27 - 9s - 325ms/step - loss: 0.0125 - val_loss: 0.0185
+Epoch 5/5
+27/27 - 7s - 265ms/step - loss: 0.0122 - val_loss: 0.0184
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.2453
+
+GRU {'units': 256, 'dropout': 0.2, 'batch_size': 128}
+Epoch 1/5
+14/14 - 13s - 939ms/step - loss: 0.0179 - val_loss: 0.0206
+Epoch 2/5
+14/14 - 13s - 924ms/step - loss: 0.0140 - val_loss: 0.0192
+Epoch 3/5
+14/14 - 12s - 871ms/step - loss: 0.0132 - val_loss: 0.0189
+Epoch 4/5
+14/14 - 14s - 965ms/step - loss: 0.0128 - val_loss: 0.0187
+Epoch 5/5
+14/14 - 12s - 879ms/step - loss: 0.0125 - val_loss: 0.0186
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.2629
+
+ units  dropout  batch_size  wrmsse
+   128      0.3          64 1.24529
+   256      0.2         128 1.26292
+    64      0.2          32 1.32368
+
+best GRU: {'units': 128, 'dropout': 0.3, 'batch_size': 64}
+
+seed 42
+Epoch 1/5
+30/30 - 10s - 331ms/step - loss: 0.0165
+Epoch 2/5
+30/30 - 9s - 288ms/step - loss: 0.0138
+Epoch 3/5
+30/30 - 10s - 317ms/step - loss: 0.0133
+Epoch 4/5
+30/30 - 9s - 308ms/step - loss: 0.0131
+Epoch 5/5
+30/30 - 9s - 294ms/step - loss: 0.0128
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.0756
+
+seed 43
+Epoch 1/5
+30/30 - 10s - 321ms/step - loss: 0.0165
+Epoch 2/5
+30/30 - 9s - 284ms/step - loss: 0.0138
+Epoch 3/5
+30/30 - 9s - 297ms/step - loss: 0.0133
+Epoch 4/5
+30/30 - 9s - 303ms/step - loss: 0.0130
+Epoch 5/5
+30/30 - 8s - 279ms/step - loss: 0.0127
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+  WRMSSE 1.2756
+
+seed 44
+Epoch 1/5
+30/30 - 11s - 356ms/step - loss: 0.0166
+Epoch 2/5
+30/30 - 8s - 282ms/step - loss: 0.0138
+Epoch 3/5
+30/30 - 9s - 306ms/step - loss: 0.0133
+Epoch 4/5
+30/30 - 9s - 302ms/step - loss: 0.0131
+Epoch 5/5
+30/30 - 9s - 297ms/step - loss: 0.0128
+  WRMSSE 0.9871
+
+3 seeds: 1.0756, 1.2756, 0.9871
+mean 1.1128  range 0.9871-1.2756
+reference project reported 0.78671
