@@ -41,11 +41,11 @@ rebuilt from those by the scripts below.
 ```bash
 pip install -r requirements.txt
 
-python -m src.prep        # ~20 s
-python -m src.features    # ~60 s
-python -m src.lgbm        # ~20 min
-python -m src.rnn         # ~13 min
-python -m src.seq2seq     # ~5 min
+python -m src.prep
+python -m src.features
+python -m src.lgbm
+python -m src.rnn
+python -m src.seq2seq
 ```
 
 ---
