@@ -1,0 +1,21 @@
+# Raw Kaggle data. Download from
+# kaggle.com/competitions/m5-forecasting-accuracy/data and unzip here.
+m5-forecasting-accuracy/
+
+# Built by src/prep.py and src/features.py. Regenerable, and far too big for git.
+data/
+
+# 40 LightGBM boosters written by src/lgbm.py. Retrainable.
+models/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
