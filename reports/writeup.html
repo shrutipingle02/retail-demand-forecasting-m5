@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>M5 Forecasting Write-up</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10.5pt; line-height: 1.55; color: #1a1a1a; margin: 0;
+  }
+  h1 { font-size: 19pt; margin: 0 0 2px; color: #0b1f52; }
+  .sub { color: #5a5a5a; font-size: 10pt; margin-bottom: 22px; }
+  h2 { font-size: 13pt; margin: 26px 0 8px; color: #0b1f52; }
+  h3 { font-size: 11pt; margin: 18px 0 6px; color: #1a1a1a; }
+  p { margin: 0 0 10px; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 16px; font-size: 9.5pt; }
+  th { text-align: left; border-bottom: 1.5px solid #c9c9c9; padding: 6px 8px 6px 0; color: #444; font-weight: 600; }
+  td { border-bottom: 1px solid #ececec; padding: 6px 8px 6px 0; vertical-align: top; }
+  td.num, th.num { text-align: right; padding-right: 14px; font-variant-numeric: tabular-nums; }
+  figure { margin: 16px 0 18px; page-break-inside: avoid; }
+  figure img { width: 100%; display: block; }
+  figcaption { font-size: 8.8pt; color: #6a6a6a; margin-top: 6px; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 9pt; background: #f4f4f2; padding: 1px 4px; }
+  pre { background: #f4f4f2; padding: 10px 12px; font-family: "SF Mono", Menlo, monospace;
+        font-size: 8.8pt; line-height: 1.45; overflow-x: auto; margin: 10px 0 14px; }
+  .callout { border-left: 3px solid #ffc220; background: #fffdf5; padding: 10px 14px; margin: 14px 0; }
+  .pb { page-break-before: always; }
+  ul { margin: 0 0 10px; padding-left: 18px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Forecasting Daily Demand at Walmart</h1>
+<div class="sub">M5 Forecasting &mdash; Accuracy &middot; 30,490 item-store series &middot; 28-day horizon</div>
+
+<h2>Introduction</h2>
+<p>Walmart sells around 3,000 distinct products in each of ten stores, and someone has to
+decide how much of each to stock. Order too much and cash sits on a shelf; order too
+little and the sale walks out the door. The M5 competition turns that into a concrete
+problem: given six years of daily sales, weekly prices and a calendar of holidays,
+forecast the next 28 days for every product in every store.</p>
+
+<p>I worked through three modelling approaches, starting with gradient boosting and moving
+into recurrent networks. The interesting part turned out not to be which model won. It was
+that none of them beat a forecast you could do in your head.</p>
+
+<h2>Data</h2>
+<p>Three files, joined into one long table of 26.5 million rows &mdash; one row per product,
+per store, per day.</p>
+
+<table>
+<tr><th>File</th><th>Contents</th></tr>
+<tr><td><code>sales_train_evaluation.csv</code></td><td>30,490 series &times; 1,941 days of unit sales</td></tr>
+<tr><td><code>sell_prices.csv</code></td><td>6.8M weekly store-item prices</td></tr>
+<tr><td><code>calendar.csv</code></td><td>1,969 days with holidays and SNAP benefit days</td></tr>
+</table>
+
+<p>The data is mostly zeros. A typical item in a typical store sells nothing on a typical
+day, which shapes every modelling decision that follows &mdash; it is why the tree model uses
+Tweedie loss and why the networks train on scaled inputs.</p>
+
+<p>Everything before day 1,100 was dropped to keep memory in check, leaving about two and a
+half years of history. Models train on days up to 1,913 and are scored on days 1,914 to
+1,941, which are held out entirely.</p>
+
+<h2>Measuring the result</h2>
+<p>Plain error metrics are misleading here. Missing a fast seller by ten units matters more
+than missing a slow one by ten units, and an error on a $40 item costs more than the same
+error on a $2 item.</p>
+
+<p>The competition metric, WRMSSE, handles both. Each series is scored against what a naive
+"same as yesterday" forecast would have achieved, so a value below 1.0 means you beat that
+baseline. Series are then weighted by the dollars they actually sold, and the whole thing
+is averaged across twelve levels of the hierarchy, from company-wide totals down to a
+single product in a single store.</p>
+
+<p>I implemented it directly rather than relying on leaderboard feedback. That mattered more
+than expected: scoring takes seconds locally, so every experiment could be checked
+immediately instead of being rationed against a daily submission limit.</p>
+
+<div class="callout">
+<strong>The baseline.</strong> Before training anything, I scored the naive forecast &mdash; repeat
+the last 28 days and call it a prediction. It came out at <strong>0.8377</strong>. Every model
+below is judged against that number.
+</div>
+
+<h2 class="pb">Approach 1 &mdash; LightGBM</h2>
+<p>Gradient boosting on engineered features: lagged sales at 1, 7, 14 and 28 days, rolling
+means and standard deviations over five window lengths, price statistics per item, and
+calendar flags. One model per store per week of the horizon, forty in total, each trained
+with Tweedie loss to handle the mass of zeros.</p>
+
+<p>On the holdout it scored <strong>0.0088</strong>. That is not a good result. That is a broken one.</p>
+
+<p>A forecast cannot be that accurate, so I checked what the model was leaning on.</p>
+
+<figure>
+  <img src="figures/05_importance.png">
+  <figcaption>Share of total model gain, top eight features. The sales column &mdash; the thing
+  being predicted &mdash; supplies 78% of it.</figcaption>
+</figure>
+
+<p>The target column had ended up inside the feature set. The model was not forecasting sales;
+it was reading them. Tracing it back, the cause was a missing comma in the list of columns
+to exclude:</p>
+
+<pre>'date', 'wm_yr_wk', 'weekday'   # time columns
+'sales'                         # target</pre>
+
+<p>Python joins two adjacent string literals into one. Those two lines produce
+<code>'weekdaysales'</code>, a column that does not exist, so neither <code>weekday</code> nor
+<code>sales</code> was actually excluded. No error, no warning, and a validation score that
+looks like a breakthrough.</p>
+
+<p>Rather than quietly fix it, I kept the switch and measured the damage. The same forty
+models were scored twice on the same 28 days &mdash; once with the sales column present, once
+with it blanked out, which is what happens whenever you forecast a future that has not
+occurred yet.</p>
+
+<figure>
+  <img src="figures/02_leak.png">
+  <figcaption>Identical models, identical days. The only difference is whether the answer
+  was sitting in the input.</figcaption>
+</figure>
+
+<p>The gap is a factor of 620. The lesson I took from it is not "check for leakage" in the
+abstract &mdash; it is that a validation score cannot detect this on its own. The number looked
+better the more broken the model became.</p>
+
+<h2>Approach 2 &mdash; LSTM and GRU</h2>
+<p>A different framing: transpose the table so days are rows and all 30,490 series are
+columns, scale everything to 0&ndash;1, and train one network to predict tomorrow for every
+series at once. A binary flag marks whether tomorrow is a holiday. Twenty-eight days are
+produced by predicting one day, feeding the prediction back in, and repeating.</p>
+
+<p>I swept both architectures across two input window lengths and three training start
+points.</p>
+
+<figure>
+  <img src="figures/06_grid.png">
+  <figcaption>Twelve configurations. GRU takes four of the top five.</figcaption>
+</figure>
+
+<p>GRU beat LSTM fairly consistently, and starting from day 150 with a 14-day window was
+best at <strong>1.0365</strong>. Both models train quickly &mdash; under a minute each.</p>
+
+<h3>Tuning made it worse</h3>
+<p>The hyperparameter search returned 1.2453, noticeably worse than the untuned model at
+1.0365. The cause is the validation split. Keras holds out the <em>last</em> 10% of samples,
+which on a time series means the most recent 190 days &mdash; the days most similar to the ones
+being forecast. Early stopping then rolled the weights back further still. The tuned model
+had simply seen less of the recent past.</p>
+
+<h3>How much of a score is luck</h3>
+<p>The same configuration trained on three random seeds gave 0.9871, 1.0756 and 1.2756. That
+is a spread of 0.29 with nothing changed but the starting random numbers. Any single run
+quoted to five decimal places is reporting noise.</p>
+
+<h2>Approach 3 &mdash; Seq2Seq GRU</h2>
+<p>An encoder GRU reads the last 14 days, its final state is repeated 28 times, and a decoder
+emits the whole horizon in one pass. No recursion, no error feeding back on itself, and no
+extra features at all.</p>
+
+<p>It scored <strong>1.1095</strong> &mdash; slightly worse than the recursive GRU, and the fastest of
+the three to train. Given that it sees only raw sales and no calendar or price signal, that
+is a reasonable showing, but it did not justify the extra architecture.</p>
+
+<h2 class="pb">Results</h2>
+
+<figure>
+  <img src="figures/01_scoreboard.png">
+  <figcaption>WRMSSE on days 1,914&ndash;1,941. Lower is better. The competition winner scored 0.520.</figcaption>
+</figure>
+
+<table>
+<tr><th>Model</th><th class="num">WRMSSE</th><th>Note</th></tr>
+<tr><td>Naive baseline</td><td class="num">0.8377</td><td>repeat the last 28 days</td></tr>
+<tr><td>GRU</td><td class="num">1.0365</td><td>best model trained</td></tr>
+<tr><td>LSTM</td><td class="num">1.0953</td><td></td></tr>
+<tr><td>Seq2Seq GRU</td><td class="num">1.1095</td><td>fastest to train</td></tr>
+<tr><td>LightGBM</td><td class="num">5.4464</td><td>target leakage, see above</td></tr>
+</table>
+
+<p>No model beat the baseline. The best of them, the GRU, is 24% worse than repeating last
+month's sales.</p>
+
+<p>It would be easy to stop there and call the exercise a failure, but the forecast itself
+explains what went wrong, and it is not subtle.</p>
+
+<figure>
+  <img src="figures/04_forecast.png">
+  <figcaption>Total units sold per day across all stores. History on the left, the 28-day
+  forecast on the right.</figcaption>
+</figure>
+
+<p>Sales run on a strong weekly cycle &mdash; weekends far above weekdays, every week, for years.
+The naive forecast reproduces that cycle perfectly, because it is literally a copy of four
+recent weeks. The GRU does not. It settles into a nearly flat line around the average and
+stays there.</p>
+
+<p>This is what recursive forecasting does when each prediction is fed back as input. Small
+errors compound, the signal washes out, and by a few steps in the model is predicting its
+own average. It captures the level of demand and loses the shape.</p>
+
+<h3>Where the models differ</h3>
+
+<figure>
+  <img src="figures/03_by_level.png">
+  <figcaption>The same forecasts scored at each of the twelve aggregation levels.</figcaption>
+</figure>
+
+<p>Two things stand out. The GRU actually overtakes the baseline at the finest levels &mdash;
+individual items in individual stores, on the right of the chart. At that scale, most series
+are sparse and erratic, and predicting a smooth average is a defensible strategy. It only
+loses because it is flat where the aggregate is not.</p>
+
+<p>The leaked LightGBM shows the opposite pattern and it is diagnostic. Its error grows as
+you aggregate upward, which healthy forecasts never do &mdash; independent errors cancel out when
+summed. Growing error means every series is wrong in the same direction at once, which is
+the signature of a model producing systematic nonsense rather than noisy estimates.</p>
+
+<h2>What I would do next</h2>
+<ul>
+<li><strong>Train longer.</strong> Five epochs was the budget and the loss was still falling
+when training stopped &mdash; 0.0166 down to 0.0128 with no sign of a plateau. This is the
+cheapest available improvement.</li>
+<li><strong>Predict all 28 days directly.</strong> The recursive loop is what flattens the
+forecast. The Seq2Seq model avoids that failure mode and deserves a proper attempt with
+calendar and price inputs, which it currently does not get.</li>
+<li><strong>Give the network the weekday.</strong> None of the recurrent models are told what
+day of the week it is. The single strongest pattern in the data is weekly, and they are
+expected to infer it from a 14-day window. The tree model got this feature; the networks
+did not.</li>
+<li><strong>Fix the validation split.</strong> Hold out a chronological block, not Keras'
+default trailing slice.</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>The headline result is that four models lost to a forecast requiring no model at all. That
+is worth stating plainly rather than burying, because the alternative &mdash; reporting the GRU's
+1.0365 as a success because it beat the other models &mdash; would have been easy and wrong.</p>
+
+<p>The baseline is what made the difference. Without it, the LightGBM run at 0.0088 reads as a
+triumph and the GRU reads as a solid result. With it, the first is visibly impossible and
+the second is visibly not good enough. Both conclusions came from one line of code that
+copies last month's sales forward.</p>
+
+</body>
+</html>
