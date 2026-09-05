@@ -1,0 +1,44 @@
+.venv/lib/python3.12/site-packages/keras/src/layers/rnn/rnn.py:199: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.
+  super().__init__(**kwargs)
+Loading and scaling...
+  matrix (1563, 30490)
+Building windows...
+  1522 windows, needs about 7.3 GB
+  7,873,562 parameters
+
+Epoch 1/10
+48/48 - 12s - 241ms/step - loss: 0.0172
+Epoch 2/10
+48/48 - 9s - 195ms/step - loss: 0.0151
+Epoch 3/10
+48/48 - 9s - 193ms/step - loss: 0.0146
+Epoch 4/10
+48/48 - 9s - 188ms/step - loss: 0.0142
+Epoch 5/10
+48/48 - 9s - 190ms/step - loss: 0.0140
+Epoch 6/10
+48/48 - 9s - 191ms/step - loss: 0.0138
+Epoch 7/10
+48/48 - 9s - 190ms/step - loss: 0.0137
+Epoch 8/10
+48/48 - 9s - 192ms/step - loss: 0.0136
+Epoch 9/10
+48/48 - 9s - 191ms/step - loss: 0.0135
+Epoch 10/10
+48/48 - 9s - 190ms/step - loss: 0.0135
+
+==========================================================
+Seq2Seq GRU   WRMSSE = 1.1095   (they scored 0.99343)
+==========================================================
+total         1.1868
+state         1.1518
+store         1.1596
+cat           1.1833
+dept          1.2312
+state-cat     1.1494
+state-dept    1.1789
+store-cat     1.1387
+store-dept    1.1473
+item          0.9853
+state-item    0.9251
+store-item    0.8769
